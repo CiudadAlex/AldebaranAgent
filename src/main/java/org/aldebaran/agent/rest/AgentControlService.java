@@ -2,8 +2,7 @@ package org.aldebaran.agent.rest;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -229,16 +228,16 @@ public class AgentControlService {
         }
     }
 
-    private static List<String> getFilesCurrentClasspath() {
+    private static List<String> getFilesCurrentClasspath() throws Exception {
 
-        final ClassLoader cl = ClassLoader.getSystemClassLoader();
+        String classpath = System.getProperty("java.class.path");
+        String[] entries = classpath.split(File.pathSeparator);
 
-        final URL[] urls = ((URLClassLoader) cl).getURLs();
+        final List<String> listFileClasspath = new ArrayList<>();
 
-        final List<String> listFileClasspath = new ArrayList<String>();
-
-        for (final URL url : urls) {
-            listFileClasspath.add(url.getFile());
+        for(String classpathEntry : entries) {
+            String cannonClasspathEntry = Paths.get(classpathEntry).toAbsolutePath().toUri().toURL().getFile();
+            listFileClasspath.add(cannonClasspathEntry);
         }
 
         return listFileClasspath;
